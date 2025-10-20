@@ -12,6 +12,7 @@ You will be provided with:
 1. **Test Case Design File**: `[StoredProcedureName]_TEST_CASES.md` (from Phase 1)
 2. **DDL File**: Database schema definition (for reference)
 3. **Stored Procedure**: The complete stored procedure code (for reference)
+4. **database_setup.sql** (if exists): Pre-populated lookup/reference data that already exists in the database before tests run
 
 ## OUTPUT REQUIREMENTS
 
@@ -101,14 +102,19 @@ For each test case in the design document, generate a TEST section:
 
 **INSERT Statement Rules**:
 1. **Analyze Setup Requirements**: From "Setup Requirements" in test design
-2. **Generate INSERT statements** for all required data:
-   - Parent records (for FKs)
-   - Lookup table entries
-   - Reference data
+2. **Check Pre-Configured Data**: If database_setup.sql exists, identify which data is already present
+   - **DO NOT** re-insert rows that exist in database_setup.sql
+   - **DO** use existing IDs/values from pre-configured data (e.g., use manager_id = 101 if Managers table is pre-populated)
+   - **DO** insert only test-specific data that doesn't exist in database_setup.sql
+3. **Generate INSERT statements** for required data NOT in database_setup.sql:
+   - Parent records (for FKs) - only if not pre-configured
+   - Lookup table entries - only if not pre-configured
+   - Reference data - only if not pre-configured
    - Primary test data
-3. **Maintain referential integrity**: Insert parent tables before child tables
-4. **Use consistent test values**: test_user_001, test_product_501, etc.
-5. **Include all columns needed**: Don't rely on defaults if they affect test outcome
+4. **Maintain referential integrity**: Insert parent tables before child tables
+5. **Use consistent test values**: test_user_001, test_product_501, etc.
+6. **Use pre-configured values**: When fields reference pre-populated tables (e.g., manager_id), use values from database_setup.sql
+7. **Include all columns needed**: Don't rely on defaults if they affect test outcome
 
 **VERIFY Section Rules** (Use Verification Strategy from design):
 
@@ -294,31 +300,43 @@ Use the Dependency Map from the test case design to generate INSERT statements:
 ### For Each Test:
 
 1. **Identify Required Dependencies** from "Setup Requirements"
-2. **Generate Parent Records First**:
+2. **Check database_setup.sql** (if provided):
+   - Identify which tables/rows are already pre-populated
+   - Note the specific IDs/values available for use
+   - **SKIP INSERT statements** for data that already exists
+3. **Generate Parent Records** (only if NOT in database_setup.sql):
    ```sql
-   -- Parent table for FK: Users.user_id
+   -- Parent table for FK: Users.user_id (NOT pre-configured)
    INSERT INTO Users (user_id, username, balance, status) 
    VALUES (1001, 'test_user_001', 100.00, 'ACTIVE');
    ```
 
-3. **Generate Lookup/Reference Data**:
+4. **Use Pre-Configured Values** (when referencing pre-populated tables):
    ```sql
-   -- Lookup table: PaymentMethods
+   -- Use existing manager_id from database_setup.sql (Managers table pre-populated with IDs 101-105)
+   INSERT INTO Employees (employee_id, name, manager_id, department) 
+   VALUES (2001, 'test_employee_001', 101, 'Sales');  -- manager_id = 101 exists in database_setup.sql
+   ```
+
+5. **Generate Lookup/Reference Data** (only if NOT in database_setup.sql):
+   ```sql
+   -- Lookup table: PaymentMethods (only if not pre-configured)
    INSERT INTO PaymentMethods (method_id, method_name) 
    VALUES (1, 'CREDIT_CARD');
    ```
 
-4. **Generate Child/Dependent Records**:
+6. **Generate Child/Dependent Records**:
    ```sql
    -- Related data: UserPreferences
    INSERT INTO UserPreferences (user_id, notification_enabled) 
    VALUES (1001, 1);
    ```
 
-5. **Use Test-Specific IDs**: Consistent patterns
+7. **Use Test-Specific IDs**: Consistent patterns
    - User IDs: 1001, 1002, 1003, etc.
    - Product IDs: 501, 502, 503, etc.
    - Transaction IDs: 2001, 2002, 2003, etc. (or let identity column handle)
+   - **Reference pre-configured IDs**: manager_id from 101-105, status_code from database_setup.sql values
 
 ## VERIFICATION QUERY GENERATION
 
@@ -390,6 +408,8 @@ Before generating output files, verify:
 - [ ] One TEST section per test case from design
 - [ ] Test IDs match CSV and design document
 - [ ] All dependencies included (from Dependency Map)
+- [ ] Pre-configured data from database_setup.sql is NOT re-inserted
+- [ ] Pre-configured IDs/values are used correctly in test data
 - [ ] INSERT statements in correct order (parents before children)
 - [ ] Referential integrity maintained
 - [ ] Test values are distinguishable and consistent
@@ -416,6 +436,7 @@ Before generating output files, verify:
 - Expected Result: SUCCESS
 - Expected Return: Transaction ID
 - Verification Needed: Yes (check balance deduction, transaction insert)
+- Uses Pre-Configured: status_code = 'ACTIVE' (from database_setup.sql)
 ```
 
 ### Output CSV Row:
@@ -429,8 +450,10 @@ HP001,Valid User Purchase,HAPPY_PATH,"User with sufficient balance purchases ava
 -- Category: HAPPY_PATH
 -- Description: User with sufficient balance purchases available product
 -- Expected: SUCCESS with transaction ID returned
+-- Pre-Configured Data: Uses status_code 'ACTIVE' from database_setup.sql
 
 -- Setup: User with sufficient balance
+-- Note: Using status_code 'ACTIVE' which is pre-populated in database_setup.sql
 INSERT INTO Users (user_id, username, balance, status) 
 VALUES (1001, 'test_user_001', 100.00, 'ACTIVE');
 
@@ -460,10 +483,11 @@ WHERE product_id = 501;
 1. **Follow the design exactly** - Don't add or remove test cases
 2. **Use approved test IDs** - Match the design document precisely
 3. **Include all dependencies** - Reference the Dependency Map
-4. **Match verification strategy** - Use the specific queries outlined in design
-5. **Maintain data integrity** - Parent records before child records
-6. **Be consistent** - Use same naming patterns throughout
-7. **Filter VERIFY queries** - Always use WHERE clauses with test-specific IDs
+4. **Respect database_setup.sql** - Do NOT re-insert pre-configured data; use existing IDs/values
+5. **Match verification strategy** - Use the specific queries outlined in design
+6. **Maintain data integrity** - Parent records before child records
+7. **Be consistent** - Use same naming patterns throughout
+8. **Filter VERIFY queries** - Always use WHERE clauses with test-specific IDs
 
 ---
 

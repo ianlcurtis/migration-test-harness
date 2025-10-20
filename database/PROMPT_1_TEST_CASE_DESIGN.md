@@ -9,7 +9,8 @@ You are a SQL testing expert. Your task is to analyze a SQL Server stored proced
 You will be provided with:
 1. **DDL File**: Database schema definition (tables, constraints, relationships)
 2. **Stored Procedure**: The complete stored procedure code to test
-3. **Additional Context**: Any business rules or requirements (optional)
+3. **database_setup.sql** (if provided): Pre-populated lookup/reference data that must exist for the stored procedure to function correctly (e.g., manager records, status codes, category lookups). These rows are inserted once before any tests run.
+4. **Additional Context**: Any business rules or requirements (optional)
 
 ## OUTPUT REQUIREMENTS
 
@@ -56,6 +57,15 @@ Extract and document:
 ### Step 2: Identify Database Dependencies
 
 Map ALL dependencies that affect the stored procedure:
+
+#### Pre-Configured Data (from database_setup.sql):
+If a `database_setup.sql` file is provided, analyze it to identify:
+- **Lookup Tables Pre-Populated**: List tables and record counts (e.g., Manager table with IDs 1-5)
+- **Reference Data Available**: Status codes, categories, types that already exist
+- **Pre-Existing IDs**: Specific IDs that are available for use in tests (e.g., Manager IDs: 101, 102, 103)
+- **Field Value Constraints**: Values that must be used from pre-configured data (e.g., must use existing manager_id values, not create new ones)
+
+**IMPORTANT**: Test data setup must NOT re-insert these pre-configured rows. Tests should reference existing IDs/values from `database_setup.sql`.
 
 #### Direct Dependencies:
 - **Tables Accessed**: List tables with operation type (SELECT/INSERT/UPDATE/DELETE)
@@ -144,6 +154,22 @@ Generate a markdown file named `[StoredProcedureName]_TEST_CASES.md` with the fo
 
 ## Dependency Map
 
+### Pre-Configured Data (if database_setup.sql provided)
+**Lookup Tables Pre-Populated:**
+- [TableName] - [Number] records with IDs [range or list]
+- [e.g., Managers - 5 records with IDs 101-105]
+- [e.g., StatusCodes - 10 records with codes: ACTIVE, PENDING, CLOSED, etc.]
+
+**Available for Test Use:**
+- [Field/ID ranges that tests can reference]
+- [e.g., manager_id values: 101, 102, 103, 104, 105]
+- [e.g., status_code values: ACTIVE, PENDING, CLOSED]
+
+**Constraints for Test Design:**
+- [Rules about using pre-configured data]
+- [e.g., Tests MUST use manager_id from 101-105, do not insert new managers]
+- [e.g., Tests MUST use existing status_code values, do not insert new codes]
+
 ### Direct Dependencies
 **Tables Accessed:**
 - Users (SELECT, UPDATE)
@@ -184,6 +210,7 @@ Generate a markdown file named `[StoredProcedureName]_TEST_CASES.md` with the fo
 - **Setup Requirements**: [What data must exist]
   - User with ID 1001, balance $100
   - Product with ID 501, price $25
+  - **Uses Pre-Configured**: manager_id = 101 (from database_setup.sql)
 - **Expected Result**: SUCCESS
 - **Expected Return**: [value or description]
 - **Dependencies Tested**: Valid FK references, sufficient balance
@@ -339,6 +366,7 @@ Before generating the output, ensure:
 4. **Think about dependencies** - Most bugs occur at dependency boundaries
 5. **Consider the procedure type** - Read-only and data-modifying procedures need different verification approaches
 6. **Coverage matters** - Aim for comprehensive coverage, not just basic happy path
+7. Include a matrix specifying the code coverage of the generated tests.
 
 ---
 
