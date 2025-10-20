@@ -1,0 +1,34 @@
+# Overview
+Use these hand-written prompts as a starting point for creating the prompts and code that build out the test harness. The prompts in this project were initially created by prompts like these, and were iterated on to improve.
+
+
+## Prompt 1 Create test data
+This part creates the test data to comprehensively test the stored procedure, which will also be used to test the migrated code to check for parity. Only use the text inside the "THE PROMPT --->" blocks. The rest is for humans.
+
+### Test case identification
+THE PROMPT --->
+I have a stored procedure in a SQL Server database that I want to thoroughly test - happy path, unhappy path, and edge cases. This will involve creating a comprehensive set of test data with which to call the stored procedure:
+- The arguments to pass the stored procedure for each test run
+- The data that needs to be in the database.
+
+I want to create:
+- A csv for the arguments, one row per test.
+- A sql INSERT script that inserts the database test data, one block per test.
+- A sql VERIFY script that selects the database data that changes during the test execution, one block per test. 
+Each row in the csv is a test, and is linked to a section of sql in the INSERT and VERIFY script. The insert script inserts the necessary data in the database required for that test - the database will be purged between test runs. make sure that if a stored procedure has dependencies that these are also included as part of the test coverage. A DDL file describing the database, and the code of the stored procedure to test will be provided.
+
+Given these requirements, create a TEST_CASE_DESIGN.md with a concise step by step process to follow in order to identify and document all of the test cases. The file MUST be in a format that can be understood by an LLM, it MUST be clear and unambiguous so that the LLM can follow it accurately.
+<--- THE PROMPT
+
+## Test data generation
+THE PROMPT --->
+Now create a TEST_FILE_GENERATION.md with a concise step by step process to follow in order to build the 2 required test files, based on the test cases identified in the previous step. The file MUST be in a format that can be understood by an LLM, it MUST be clear and unambiguous so that the LLM can follow it accurately.
+<--- THE PROMPT
+
+## Prompt 2 Create test harness app
+THE PROMPT --->
+Now create a c#.net console application that can be configured to run the tests that this prompt will create.
+The console application must log the output of all the test runs. The output of the test run must include:
+	- The output from the stored procedure, if any
+	- The state of the database e.g. the values in tables affected by the test run, retrieved by the VERIFY script.
+<--- THE PROMPT
