@@ -1,4 +1,4 @@
-# SQL Server Stored Procedure Testing Framework# SQL Server Stored Procedure Testing Framework# SQL Server Stored Procedure Testing Framework# SQL Server Stored Procedure Testing Framework - Project Structure
+# SQL Server Stored Procedure Testing Framework# - Project Structure
 
 
 
