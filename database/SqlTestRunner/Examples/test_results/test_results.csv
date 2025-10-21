@@ -1,24 +1,24 @@
 test_id,test_name,execution_date,status,actual_result,error_message,notes,duration_ms,return_value,output_params_count,result_sets_count,database_tables_captured
-HP001,Basic Quote - Standard Sedan Lease,2025-10-21 13:04:28,Pass,0,,"Executed in 264ms. Return Value: 0, Result Sets: 1, Output Params: 3",264,0,3,1,5
-HP002,Quote with Maintenance and Insurance Packages,2025-10-21 13:04:28,Pass,0,,"Executed in 213ms. Return Value: 0, Result Sets: 1, Output Params: 3",213,0,3,1,5
-HP003,Quote with Discount Applied,2025-10-21 13:04:28,Pass,0,,"Executed in 194ms. Return Value: 0, Result Sets: 1, Output Params: 3",194,0,3,1,5
-HP004,Quote for Premium Convertible,2025-10-21 13:04:29,Pass,0,,"Executed in 205ms. Return Value: 0, Result Sets: 1, Output Params: 3",205,0,3,1,5
-HP005,Minimal Required Parameters Only,2025-10-21 13:04:29,Pass,0,,"Executed in 199ms. Return Value: 0, Result Sets: 1, Output Params: 3",199,0,3,1,5
-HP006,Quote for Older Vehicle Model,2025-10-21 13:04:30,Pass,0,,"Executed in 202ms. Return Value: 0, Result Sets: 1, Output Params: 3",202,0,3,1,5
-HP007,High Mileage Lease Quote,2025-10-21 13:04:30,Pass,0,,"Executed in 193ms. Return Value: 0, Result Sets: 1, Output Params: 3",193,0,3,1,5
-HP008,Quote with NULL Optional Fields,2025-10-21 13:04:31,Pass,0,,"Executed in 198ms. Return Value: 0, Result Sets: 1, Output Params: 3",198,0,3,1,5
-UP001,Missing Required Customer Name,2025-10-21 13:04:31,Pass,SQL ERROR: Customer name is required,Customer name is required,,60,,0,0,0
-UP002,Empty String Customer Name,2025-10-21 13:04:31,Pass,SQL ERROR: Customer name is required,Customer name is required,,44,,0,0,0
-UP003,Invalid Quantity (Zero),2025-10-21 13:04:32,Pass,SQL ERROR: Quantity must be greater than 0,Quantity must be greater than 0,,40,,0,0,0
-UP004,Invalid Quantity (Negative),2025-10-21 13:04:32,Pass,SQL ERROR: Quantity must be greater than 0,Quantity must be greater than 0,,52,,0,0,0
-UP005,Lease Duration Too Short,2025-10-21 13:04:32,Pass,SQL ERROR: Lease duration must be between 1 and 120 months,Lease duration must be between 1 and 120 months,,55,,0,0,0
-UP006,Lease Duration Too Long,2025-10-21 13:04:33,Pass,SQL ERROR: Lease duration must be between 1 and 120 months,Lease duration must be between 1 and 120 months,,49,,0,0,0
-UP007,Invalid ModelID (Non-Existent),2025-10-21 13:04:33,Pass,SQL ERROR: Invalid or inactive vehicle model,Invalid or inactive vehicle model,,52,,0,0,0
-EC001,Maximum Valid Lease Duration,2025-10-21 13:04:33,Pass,0,,"Executed in 198ms. Return Value: 0, Result Sets: 1, Output Params: 3",198,0,3,1,5
-EC002,Minimum Valid Lease Duration,2025-10-21 13:04:34,Pass,0,,"Executed in 202ms. Return Value: 0, Result Sets: 1, Output Params: 3",202,0,3,1,5
-EC003,Maximum Discount Percentage,2025-10-21 13:04:34,Pass,0,,"Executed in 187ms. Return Value: 0, Result Sets: 1, Output Params: 3",187,0,3,1,5
-EC004,Zero Miles Per Month,2025-10-21 13:04:34,Pass,0,,"Executed in 203ms. Return Value: 0, Result Sets: 1, Output Params: 3",203,0,3,1,5
-EC005,Very Long Customer Name (Boundary),2025-10-21 13:04:35,Pass,0,,"Executed in 194ms. Return Value: 0, Result Sets: 1, Output Params: 3",194,0,3,1,5
-EC006,Current Year Vehicle (No Adjustment),2025-10-21 13:04:35,Pass,0,,"Executed in 191ms. Return Value: 0, Result Sets: 1, Output Params: 3",191,0,3,1,5
-EC007,Exactly 24-Month Lease (Short Lease Threshold),2025-10-21 13:04:36,Pass,0,,"Executed in 189ms. Return Value: 0, Result Sets: 1, Output Params: 3",189,0,3,1,5
-EC008,Exactly 48-Month Lease (Long Lease Discount Threshold),2025-10-21 13:04:36,Pass,0,,"Executed in 190ms. Return Value: 0, Result Sets: 1, Output Params: 3",190,0,3,1,5
+HP001,Basic Quote - Standard Sedan Lease,2025-10-21 13:54:03,Pass,0,,"Executed in 484ms. Return Value: 0, Result Sets: 1, Output Params: 3",484,0,3,1,5
+HP002,Quote with Maintenance and Insurance Packages,2025-10-21 13:54:03,Pass,0,,"Executed in 218ms. Return Value: 0, Result Sets: 1, Output Params: 3",218,0,3,1,5
+HP003,Quote with Discount Applied,2025-10-21 13:54:04,Pass,0,,"Executed in 210ms. Return Value: 0, Result Sets: 1, Output Params: 3",210,0,3,1,5
+HP004,Quote for Premium Convertible,2025-10-21 13:54:04,Pass,0,,"Executed in 188ms. Return Value: 0, Result Sets: 1, Output Params: 3",188,0,3,1,5
+HP005,Minimal Required Parameters Only,2025-10-21 13:54:05,Pass,0,,"Executed in 223ms. Return Value: 0, Result Sets: 1, Output Params: 3",223,0,3,1,5
+HP006,Quote for Older Vehicle Model,2025-10-21 13:54:05,Pass,0,,"Executed in 210ms. Return Value: 0, Result Sets: 1, Output Params: 3",210,0,3,1,5
+HP007,High Mileage Lease Quote,2025-10-21 13:54:06,Pass,0,,"Executed in 197ms. Return Value: 0, Result Sets: 1, Output Params: 3",197,0,3,1,5
+HP008,Quote with NULL Optional Fields,2025-10-21 13:54:06,Pass,0,,"Executed in 202ms. Return Value: 0, Result Sets: 1, Output Params: 3",202,0,3,1,5
+UP001,Missing Required Customer Name,2025-10-21 13:54:07,Pass,SQL ERROR: Customer name is required,Customer name is required,,46,,0,0,0
+UP002,Empty String Customer Name,2025-10-21 13:54:07,Pass,SQL ERROR: Customer name is required,Customer name is required,,47,,0,0,0
+UP003,Invalid Quantity (Zero),2025-10-21 13:54:07,Pass,SQL ERROR: Quantity must be greater than 0,Quantity must be greater than 0,,42,,0,0,0
+UP004,Invalid Quantity (Negative),2025-10-21 13:54:07,Pass,SQL ERROR: Quantity must be greater than 0,Quantity must be greater than 0,,50,,0,0,0
+UP005,Lease Duration Too Short,2025-10-21 13:54:08,Pass,SQL ERROR: Lease duration must be between 1 and 120 months,Lease duration must be between 1 and 120 months,,46,,0,0,0
+UP006,Lease Duration Too Long,2025-10-21 13:54:08,Pass,SQL ERROR: Lease duration must be between 1 and 120 months,Lease duration must be between 1 and 120 months,,51,,0,0,0
+UP007,Invalid ModelID (Non-Existent),2025-10-21 13:54:08,Pass,SQL ERROR: Invalid or inactive vehicle model,Invalid or inactive vehicle model,,54,,0,0,0
+EC001,Maximum Valid Lease Duration,2025-10-21 13:54:09,Pass,0,,"Executed in 202ms. Return Value: 0, Result Sets: 1, Output Params: 3",202,0,3,1,5
+EC002,Minimum Valid Lease Duration,2025-10-21 13:54:09,Pass,0,,"Executed in 194ms. Return Value: 0, Result Sets: 1, Output Params: 3",194,0,3,1,5
+EC003,Maximum Discount Percentage,2025-10-21 13:54:09,Pass,0,,"Executed in 180ms. Return Value: 0, Result Sets: 1, Output Params: 3",180,0,3,1,5
+EC004,Zero Miles Per Month,2025-10-21 13:54:10,Pass,0,,"Executed in 191ms. Return Value: 0, Result Sets: 1, Output Params: 3",191,0,3,1,5
+EC005,Very Long Customer Name (Boundary),2025-10-21 13:54:10,Pass,0,,"Executed in 201ms. Return Value: 0, Result Sets: 1, Output Params: 3",201,0,3,1,5
+EC006,Current Year Vehicle (No Adjustment),2025-10-21 13:54:11,Pass,0,,"Executed in 187ms. Return Value: 0, Result Sets: 1, Output Params: 3",187,0,3,1,5
+EC007,Exactly 24-Month Lease (Short Lease Threshold),2025-10-21 13:54:11,Pass,0,,"Executed in 186ms. Return Value: 0, Result Sets: 1, Output Params: 3",186,0,3,1,5
+EC008,Exactly 48-Month Lease (Long Lease Discount Threshold),2025-10-21 13:54:12,Pass,0,,"Executed in 184ms. Return Value: 0, Result Sets: 1, Output Params: 3",184,0,3,1,5
