@@ -224,6 +224,9 @@ class Program
             builder.AddJsonFile(configFile.FullName, optional: false);
         }
 
+        // Load user secrets (for development)
+        builder.AddUserSecrets<Program>();
+
         var configuration = builder.Build();
         
         // Load base configuration
