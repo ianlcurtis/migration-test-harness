@@ -7,7 +7,7 @@ You are a SQL testing expert. Your task is to analyze a SQL Server stored proced
 ## INPUT REQUIREMENTS
 
 You will be provided with:
-1. **DDL File**: Database schema definition (tables, constraints, relationships)
+1. **DDL File** (e.g., `create_database.sql`): Database schema definition including table structures, constraints, foreign key relationships, and identity columns
 2. **Stored Procedure**: The complete stored procedure code to test
 3. **database_setup.sql** (if provided): Pre-populated lookup/reference data that must exist for the stored procedure to function correctly (e.g., manager records, status codes, category lookups). These rows are inserted once before any tests run.
 4. **Additional Context**: Any business rules or requirements (optional)
@@ -63,6 +63,7 @@ If a `database_setup.sql` file is provided, analyze it to identify:
 - **Lookup Tables Pre-Populated**: List tables and record counts (e.g., Manager table with IDs 1-5)
 - **Reference Data Available**: Status codes, categories, types that already exist
 - **Pre-Existing IDs**: Specific IDs that are available for use in tests (e.g., Manager IDs: 101, 102, 103)
+- **Seed Data ID Ranges**: Document the maximum ID used in each pre-populated table (e.g., Managers use IDs 101-105, so test data should start at 1000+)
 - **Field Value Constraints**: Values that must be used from pre-configured data (e.g., must use existing manager_id values, not create new ones)
 
 **IMPORTANT**: Test data setup must NOT re-insert these pre-configured rows. Tests should reference existing IDs/values from `database_setup.sql`.
@@ -164,6 +165,14 @@ Generate a markdown file named `[StoredProcedureName]_TEST_CASES.md` with the fo
 - [Field/ID ranges that tests can reference]
 - [e.g., manager_id values: 101, 102, 103, 104, 105]
 - [e.g., status_code values: ACTIVE, PENDING, CLOSED]
+
+**Test Data ID Ranges:**
+- [Specify starting IDs for test data in each table]
+- [e.g., Test Users: Start at user_id = 1000 (use 1000, 1001, 1002, etc. across tests)]
+- [e.g., Test Products: Start at product_id = 500 (use 500, 501, 502, etc. across tests)]
+- [e.g., Test Transactions: Start at transaction_id = 2000 (use 2000, 2001, 2002, etc. across tests)]
+- [Rule: Leave gap of at least 500 between seed data and test data]
+- [Rule: Each test case should use unique IDs to avoid conflicts between tests]
 
 **Constraints for Test Design:**
 - [Rules about using pre-configured data]
@@ -329,19 +338,24 @@ After human review and approval:
 
 ## EXECUTION INSTRUCTIONS
 
-1. **Read and analyze** the provided DDL and stored procedure thoroughly
+1. **Read and analyze** the provided DDL (create_database.sql) and stored procedure thoroughly
 2. **Determine procedure type**: Data-Modifying (INSERT/UPDATE/DELETE/MERGE) or Read-Only (SELECT only)
-3. **Map ALL dependencies** using the dependency mapping steps above
-4. **Extract parameters** and their characteristics
-5. **Identify business logic** including validations, calculations, and error conditions
-6. **Design test cases** ensuring comprehensive coverage:
+3. **Analyze pre-configured data** (if database_setup.sql provided):
+   - Identify all pre-populated tables and their ID ranges
+   - Determine appropriate test data ID ranges (starting at least 500 higher than seed data)
+   - Document which values can be referenced vs. which must be created
+4. **Map ALL dependencies** using the dependency mapping steps above
+5. **Extract parameters** and their characteristics
+6. **Identify business logic** including validations, calculations, and error conditions
+7. **Design test cases** ensuring comprehensive coverage:
    - Minimum 10 total test cases
    - Balance across categories (HAPPY_PATH, UNHAPPY_PATH, EDGE_CASE)
    - Cover all parameters, dependencies, and business logic
-7. **Define verification strategy** based on procedure type
-8. **Complete coverage checklists** to ensure nothing is missed
-9. **Format output** as specified in the OUTPUT FORMAT section above
-10. **Generate the markdown file** for human review
+   - Use consistent test ID ranges across all test cases
+8. **Define verification strategy** based on procedure type
+9. **Complete coverage checklists** to ensure nothing is missed
+10. **Format output** as specified in the OUTPUT FORMAT section above
+11. **Generate the markdown file** for human review
 
 ## QUALITY CHECKLIST
 
@@ -363,10 +377,12 @@ Before generating the output, ensure:
 1. **This is Phase 1 only** - Do NOT generate CSV or SQL files yet
 2. **Be thorough** - The test case design will be reviewed by humans
 3. **Be specific** - Each test case should have enough detail to implement
-4. **Think about dependencies** - Most bugs occur at dependency boundaries
-5. **Consider the procedure type** - Read-only and data-modifying procedures need different verification approaches
-6. **Coverage matters** - Aim for comprehensive coverage, not just basic happy path
-7. Include a matrix specifying the code coverage of the generated tests.
+4. **Define test data ID ranges** - MUST specify starting IDs for test data in each table (PROMPT 2 will use these exact ranges)
+5. **Think about dependencies** - Most bugs occur at dependency boundaries
+6. **Consider the procedure type** - Read-only and data-modifying procedures need different verification approaches
+7. **Coverage matters** - Aim for comprehensive coverage, not just basic happy path
+8. **Include a matrix** - Specify code coverage of the generated tests
+9. **ID consistency** - All test cases should use IDs within the defined test data ranges
 
 ---
 

@@ -140,17 +140,100 @@ public class SqlTestExecutor : ISqlTestExecutor
                 CommandTimeout = _config.CommandTimeoutSeconds
             };
 
-            // Add parameters from test case
-            var outputParams = new List<SqlParameter>();
-            foreach (var param in testCase.Parameters)
+            // Discover stored procedure parameters dynamically
+            SqlCommandBuilder.DeriveParameters(command);
+            
+            _logger.LogInformation("=== Discovered {Count} parameters for {ProcName} ===", command.Parameters.Count, _config.StoredProcedureName);
+            foreach (SqlParameter p in command.Parameters)
             {
-                var sqlParam = command.Parameters.AddWithValue($"@{param.Key}", param.Value ?? DBNull.Value);
-                _logger.LogDebug("Added parameter @{ParamName} = {ParamValue}", param.Key, param.Value);
+                _logger.LogInformation("  {Name}: Direction={Direction}, SqlDbType={Type}, Size={Size}, HasDefault={HasDefault}", 
+                    p.ParameterName, p.Direction, p.SqlDbType, p.Size, p.Value != DBNull.Value);
             }
 
-            // Add return value parameter
-            var returnParam = command.Parameters.Add("@RETURN_VALUE", SqlDbType.Int);
-            returnParam.Direction = ParameterDirection.ReturnValue;
+            // Track which INPUT parameters to remove (those with defaults that aren't provided)
+            var parametersToRemove = new List<SqlParameter>();
+
+            // Map test case parameters to stored procedure parameters
+            foreach (SqlParameter sqlParam in command.Parameters)
+            {
+                var paramNameWithoutAt = sqlParam.ParameterName.TrimStart('@');
+                
+                // Only process INPUT parameters - skip OUTPUT and RETURN VALUE
+                if (sqlParam.Direction == ParameterDirection.Input)
+                {
+                    // Check if test case provides a value for this parameter
+                    if (testCase.Parameters.ContainsKey(paramNameWithoutAt))
+                    {
+                        var testValue = testCase.Parameters[paramNameWithoutAt];
+                        
+                        if (testValue != null)
+                        {
+                            sqlParam.Value = testValue;
+                            _logger.LogDebug("Set INPUT parameter {ParamName} = {ParamValue}", sqlParam.ParameterName, testValue);
+                        }
+                        else
+                        {
+                            // NULL value explicitly provided by test case
+                            // For UNHAPPY_PATH/ERROR tests, this tests NULL validation
+                            // For other tests, remove parameter to allow default value
+                            if (testCase.TestCategory == "UNHAPPY_PATH" || testCase.ExpectedResult == "ERROR")
+                            {
+                                sqlParam.Value = DBNull.Value;
+                                _logger.LogDebug("Set INPUT parameter {ParamName} = DBNull (testing NULL validation in UNHAPPY_PATH)", sqlParam.ParameterName);
+                            }
+                            else
+                            {
+                                // HAPPY_PATH with NULL - remove to use stored procedure default
+                                parametersToRemove.Add(sqlParam);
+                                _logger.LogDebug("Will remove INPUT parameter {ParamName} (NULL in HAPPY_PATH, use default)", sqlParam.ParameterName);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Parameter not provided in test case - assume it has a default, remove it
+                        parametersToRemove.Add(sqlParam);
+                        _logger.LogDebug("INPUT parameter {ParamName} not in test case, will remove to use default", sqlParam.ParameterName);
+                    }
+                }
+                else if (sqlParam.Direction == ParameterDirection.Output)
+                {
+                    // Keep OUTPUT parameters - they are required by the stored procedure
+                    _logger.LogDebug("Keeping OUTPUT parameter: {ParamName} ({SqlDbType})", sqlParam.ParameterName, sqlParam.SqlDbType);
+                }
+                else if (sqlParam.Direction == ParameterDirection.InputOutput)
+                {
+                    // InputOutput parameters in SQL Server OUTPUT parameters
+                    // They must have a value - set to DBNull if not provided
+                    if (sqlParam.Value == null)
+                    {
+                        sqlParam.Value = DBNull.Value;
+                        _logger.LogDebug("Set INPUTOUTPUT parameter (OUTPUT) {ParamName} to DBNull", sqlParam.ParameterName);
+                    }
+                    else
+                    {
+                        _logger.LogDebug("Keeping INPUTOUTPUT parameter (OUTPUT): {ParamName} with existing value", sqlParam.ParameterName);
+                    }
+                }
+                else if (sqlParam.Direction == ParameterDirection.ReturnValue)
+                {
+                    _logger.LogDebug("Keeping RETURN VALUE parameter");
+                }
+            }
+
+            // Remove only INPUT parameters that should use defaults (keep OUTPUT parameters!)
+            foreach (var param in parametersToRemove)
+            {
+                command.Parameters.Remove(param);
+                _logger.LogDebug("Removed INPUT parameter {ParamName}", param.ParameterName);
+            }
+            
+            _logger.LogInformation("=== Final parameter list ({Count} total) ===", command.Parameters.Count);
+            foreach (SqlParameter p in command.Parameters)
+            {
+                _logger.LogInformation("  {Name}: Direction={Direction}, Value={Value}", 
+                    p.ParameterName, p.Direction, p.Value == null ? "null" : (p.Value == DBNull.Value ? "DBNull" : p.Value.ToString()));
+            }
 
             // Execute stored procedure and capture result sets
             using var reader = await command.ExecuteReaderAsync();
@@ -178,15 +261,17 @@ public class SqlTestExecutor : ISqlTestExecutor
 
             await reader.CloseAsync();
 
-            // Capture return value
-            result.ReturnValue = returnParam.Value != DBNull.Value ? returnParam.Value : null;
-
-            // Capture output parameters
+            // Capture return value and output parameters
             foreach (SqlParameter param in command.Parameters)
             {
-                if (param.Direction == ParameterDirection.Output || param.Direction == ParameterDirection.InputOutput)
+                if (param.Direction == ParameterDirection.ReturnValue)
+                {
+                    result.ReturnValue = param.Value != DBNull.Value ? param.Value : null;
+                }
+                else if (param.Direction == ParameterDirection.Output || param.Direction == ParameterDirection.InputOutput)
                 {
                     result.OutputParameters[param.ParameterName] = param.Value != DBNull.Value ? param.Value : null;
+                    _logger.LogDebug("Captured OUTPUT parameter @{ParamName} = {ParamValue}", param.ParameterName, param.Value);
                 }
             }
 
